@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Coupon Generator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <style>
+      /* Body Styling */
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background-color: #f7f7f7;
+        min-height: 100vh;
+      }
+
+      /* Header Styling */
+      h1 {
+        color: #4b2e83; /* NYU Violet */
+        margin: 20px 0;
+      }
+
+      /* Form Styling */
+      form {
+        background: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        width: 90%;
+        max-width: 500px;
+        margin: 20px auto;
+        border-top: 4px solid #4b2e83;
+      }
+
+      /* Label Styling */
+      label {
+        font-size: 14px;
+        color: #4b2e83; /* NYU Violet */
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+      }
+
+      /* Input and Select Styling */
+      input,
+      select {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 5px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 14px;
+        box-sizing: border-box;
+      }
+
+      input:focus,
+      select:focus {
+        border-color: #4b2e83; /* Violet Focus */
+        outline: none;
+        box-shadow: 0 0 5px rgba(75, 46, 131, 0.5);
+      }
+
+      /* Error Message Styling */
+      .error {
+        color: red;
+        font-size: 12px;
+        margin-top: -5px;
+        margin-bottom: 10px;
+      }
+    
+
+      /* Button Styling */
+      button {
+        background-color: #4b2e83; /* Violet */
+        color: white;
+        border: none;
+        padding: 12px;
+        border-radius: 4px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        width: 100%;
+      }
+
+      button:hover {
+        background-color: #371f56; /* Darker Violet */
+      }
+
+      /* QR Code Container */
+      .qr-code-container {
+        text-align: center;
+        margin: 20px auto;
+        padding: 0 20px;
+        max-width: 500px;
+        width: 90%;
+      }
+
+      .qr-code-container img {
+        max-width: 100%;
+        height: auto;
+        margin-top: 10px;
+      }
+
+      /* Enhanced Mobile Responsiveness */
+      @media (max-width: 600px) {
+        body {
+          padding: 10px;
+        }
+
+        form {
+          width: 95%;
+          padding: 15px;
+          margin: 10px auto;
+        }
+
+        h1 {
+          font-size: 24px;
+          text-align: center;
+          padding: 0 10px;
+        }
+
+        input,
+        select {
+          font-size: 16px; /* Prevents iOS zoom on focus */
+          padding: 12px 10px;
+        }
+
+        label {
+          font-size: 16px;
+        }
+
+        button {
+          padding: 15px;
+          margin-top: 10px;
+        }
+      }
+
+      /* Landscape Orientation */
+      @media (max-height: 600px) and (orientation: landscape) {
+        body {
+          padding: 10px;
+        }
+
+        h1 {
+          font-size: 20px;
+          margin: 10px 0;
+        }
+
+        form {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 15px;
+          max-width: 800px;
+        }
+
+        button {
+          grid-column: span 2;
+        }
+
+        .qr-code-container {
+          max-width: 800px;
+        }
+      }
+
+      /* Add these new styles */
+      .tab-container {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+        width: 90%;
+        max-width: 500px;
+      }
+
+      .tab-button {
+        flex: 1;
+        padding: 10px;
+        background-color: #ffffff;
+        border: 2px solid #4b2e83;
+        color: #4b2e83;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      .tab-button.active {
+        background-color: #4b2e83;
+        color: white;
+      }
+
+      #redeemForm {
+        display: none;
+      }
+
+      /* Add these new styles */
+      #reader {
+        width: 100%;
+        max-width: 500px;
+        margin: 20px auto;
+      }
+
+      #reader video {
+        border-radius: 8px;
+      }
+
+      .scanner-container {
+        background: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        width: 90%;
+        max-width: 500px;
+        margin: 20px auto;
+        border-top: 4px solid #4b2e83;
+      }
+
+      .scan-message {
+        text-align: center;
+        margin: 10px 0;
+        color: #4b2e83;
+      }
+
+      #startScanButton {
+        margin-bottom: 10px;
+      }
+
+      #stopScanButton {
+        background-color: #dc3545;
+        margin-top: 10px;
+        display: none;
+      }
+
+      #stopScanButton:hover {
+        background-color: #bd2130;
+      }
+
+      .wallet-button {
+        display: inline-block;
+        background-color: #000;
+        color: #fff;
+        padding: 10px 20px;
+        border-radius: 5px;
+        text-decoration: none;
+        margin-top: 10px;
+      }
+      
+      .wallet-button:hover {
+        background-color: #333;
+      }
+      
+      #passKitInfo {
+        margin-top: 20px;
+        text-align: center;
+      }
+    </style>
+    <script>
+      // Populate the "Uses Allowed" dropdown dynamically
+      document.addEventListener("DOMContentLoaded", () => {
+        const usesAllowed = document.getElementById("Uses_Allowed");
+        for (let i = 1; i <= 10; i++) {
+          const option = document.createElement("option");
+          option.value = i;
+          option.textContent = i;
+          usesAllowed.appendChild(option);
+        }
+        const unlimitedOption = document.createElement("option");
+        unlimitedOption.value = "Unlimited";
+        unlimitedOption.textContent = "Unlimited";
+        usesAllowed.appendChild(unlimitedOption);
+      });
+
+      // Add live validation for form fields
+      document.addEventListener("DOMContentLoaded", () => {
+        // Validation for each field
+        document.getElementById("Expiration_Date").addEventListener("input", () => {
+          const field = document.getElementById("Expiration_Date");
+          const error = document.querySelector("#Expiration_Date + .error");
+          if (new Date(field.value) <= new Date()) {
+            showError(field, "Expiration date must be in the future.");
+          } else {
+            removeError(error);
+          }
+        });
+
+        document.getElementById("Service_Type").addEventListener("input", () => {
+        const field = document.getElementById("Service_Type");
+        const error = document.querySelector("#Service_Type + .error");
+        const validTypes = [
+          "Restaurants",
+          "CampusBookstore",
+          "GymMemberships",
+          "StudentTransport",
+          "MovieTickets",
+          "OnlineCourses",
+          "SoftwareDiscounts",
+          "DiningPlans"
+        ]; // Match the value fields in the dropdown options
+        
+        if (!validTypes.includes(field.value)) {
+          showError(field, `Service type must be one of: ${validTypes.join(", ")}`);
+        } else {
+          removeError(error);
+        }
+      });
+
+
+
+        document.getElementById("Discount").addEventListener("input", () => {
+          const field = document.getElementById("Discount");
+          const error = document.querySelector("#Discount + .error");
+          if (field.value < 0 || field.value > 100) {
+            showError(field, "Discount must be between 0 and 100%.");
+          } else {
+            removeError(error);
+          }
+        });
+
+        document.getElementById("Recipient_Email").addEventListener("input", () => {
+          const field = document.getElementById("Recipient_Email");
+          const error = document.querySelector("#Recipient_Email + .error");
+          if (!field.value.endsWith("@nyu.edu")) {
+            showError(field, "Email must end with @nyu.edu.");
+          } else {
+            removeError(error);
+          }
+        });
+
+        document.getElementById("Reciepient_Name").addEventListener("input", () => {
+          const field = document.getElementById("Reciepient_Name");
+          const error = document.querySelector("#Reciepient_Name + .error");
+          if (!/^[a-zA-Z\s]+$/.test(field.value)) {
+            showError(field, "Name must contain only letters.");
+          } else {
+            removeError(error);
+          }
+        });
+
+
+        document.getElementById("Phone_Number").addEventListener("input", () => {
+        const field = document.getElementById("Phone_Number");
+        const error = document.querySelector("#Phone_Number + .error");
+
+        // Regular expression for phone numbers (supports optional "+" and 10-15 digits)
+          const phoneRegex = /^[0-9]{10}$/;
+
+          if (!phoneRegex.test(field.value)) {
+            showError(field, "Phone number must be exactly 10 digits.");
+          } else {
+            removeError(error);
+          }
+        });
+        
+      });
+
+      // Show an error message below a field
+      function showError(field, message) {
+        const existingError = document.querySelector(`#${field.id} + .error`);
+        if (!existingError) {
+          const error = document.createElement("div");
+          error.className = "error";
+          error.innerText = message;
+          field.insertAdjacentElement("afterend", error);
+        }
+      }
+
+      // Remove an error message
+      function removeError(error) {
+        if (error) {
+          error.remove();
+        }
+      }
+
+      // Update the submitCoupon function to handle PassKit data
+      function submitCoupon() {
+        // Validate all fields on submit
+        const errors = document.querySelectorAll(".error");
+        if (errors.length > 0) {
+          alert("Please correct the errors before submitting.");
+          return;
+        }
+
+        // Collect form data
+        const couponData = {
+          expirationDate: document.getElementById("Expiration_Date").value,
+          serviceType: document.getElementById("Service_Type").value,
+          discount: document.getElementById("Discount").value,
+          usesAllowed: document.getElementById("Uses_Allowed").value,
+          recipientEmail: document.getElementById("Recipient_Email").value,
+          recipientName: document.getElementById("Reciepient_Name").value,
+          phoneNumber: document.getElementById("Phone_Number").value // Add phone number
+
+        };
+
+        // Call the Apps Script function
+        google.script.run
+          .withSuccessHandler((result) => {
+            document.getElementById("resultMessage").innerText = 
+              `Coupon created successfully with ID: ${result.id}`;
+            
+            const qrCodeContainer = document.getElementById("qrCodeContainer");
+            qrCodeContainer.innerHTML = `
+              <p>Scan this QR code to add the coupon to your wallet:</p>
+              <img src="${result.qrUrl}" alt="QR Code" />
+              <p><a href="${result.qrUrl}" target="_blank">
+                Click here to add to Apple Wallet
+              </a></p>
+              <p><a href="${result.passUrl}" target="_blank">
+                This is pass URL Link. Click this.
+              </a></p>
+            `;
+            
+            // Clear the form after successful submission
+            document.querySelector('form').reset();
+          })
+          .withFailureHandler((error) => {
+            alert(`Error: ${error.message}`);
+          })
+          .addCouponEntry(couponData);
+      }
+
+      // Add these new functions
+      function showCreateForm() {
+        document.getElementById('createForm').style.display = 'block';
+        document.getElementById('redeemForm').style.display = 'none';
+        document.getElementById('createTab').classList.add('active');
+        document.getElementById('redeemTab').classList.remove('active');
+        document.getElementById('formTitle').textContent = 'Create a Coupon';
+      }
+
+     let isPasswordValidated = false; // Track whether the admin password is validated
+
+      function showRedeemForm() {
+        document.getElementById("createForm").style.display = "none";
+        document.getElementById("redeemForm").style.display = "block";
+        document.getElementById("createTab").classList.remove("active");
+        document.getElementById("redeemTab").classList.add("active");
+        document.getElementById("formTitle").textContent = "Scan Coupon";
+
+        // Reset the scanner state and password validation
+        stopScanner();
+        document.getElementById("scanMessage").innerHTML = "";
+        document.getElementById("scannerUI").style.display = "none";
+        document.getElementById("passwordMessage").innerHTML = "";
+        isPasswordValidated = false;
+
+        document.getElementById("qrCodeContainer").style.display = "none";
+
+      }
+      // Validate the admin password
+      function validateAdminPassword() {
+        const adminPassword = document.getElementById("Admin_Password").value;
+        const passwordMessage = document.getElementById("passwordMessage");
+        
+        const validPassword = "Admin123"; // Replace this with your actual admin password or secure it elsewhere
+        
+        if (adminPassword === validPassword) {
+          isPasswordValidated = true;
+          passwordMessage.innerHTML = "<span style='color: green;'>Access Granted. Scanner Unlocked.</span>";
+          document.getElementById("scannerUI").style.display = "block"; // Show the scanner UI
+        } else {
+          isPasswordValidated = false;
+          passwordMessage.innerHTML = "<span style='color: red;'>Invalid Password. Please try again.</span>";
+          document.getElementById("scannerUI").style.display = "none"; // Hide the scanner UI
+        }
+      }
+
+
+      let html5QrcodeScanner = null;
+
+      // Start the scanner only if password is validated
+      function startScanner() {
+        if (!isPasswordValidated) {
+          alert("You must validate the admin password first.");
+          return;
+        }
+
+        document.getElementById("scanMessage").innerHTML = "";
+        document.getElementById("startScanButton").style.display = "none";
+        document.getElementById("stopScanButton").style.display = "block";
+
+        html5QrcodeScanner = new Html5Qrcode("reader");
+        const config = {
+          fps: 10,
+          qrbox: { width: 250, height: 250 },
+          aspectRatio: 1.0
+        };
+
+        html5QrcodeScanner.start(
+          { facingMode: "environment" },
+          config,
+          onScanSuccess,
+          onScanFailure
+        );
+      }
+
+      function stopScanner() {
+        if (html5QrcodeScanner) {
+          html5QrcodeScanner.stop().then(() => {
+            document.getElementById('startScanButton').style.display = 'block';
+            document.getElementById('stopScanButton').style.display = 'none';
+          });
+        }
+      }
+
+      // Update the onScanSuccess function to handle PassKit data
+      function onScanSuccess(decodedText, decodedResult) {
+        stopScanner();
+
+        try {
+          // Extract the coupon ID from the scanned QR code
+          const couponIdMatch = decodedText.match(/C-\d+/);
+          if (!couponIdMatch) {
+            throw new Error("Invalid coupon format");
+          }
+
+          const couponId = couponIdMatch[0];
+
+          // Call the back-end redeemCoupon function
+          google.script.run
+            .withSuccessHandler((result) => {
+              // Display success message for successful redemption
+              document.getElementById("scanMessage").innerHTML = `
+                <div style="color: green;">${result}</div>
+              `;
+            })
+            .withFailureHandler((error) => {
+              // Display error message for redemption failure
+              document.getElementById("scanMessage").innerHTML = `
+                <div style="color: red;">${error.message}</div>
+              `;
+            })
+            .redeemCoupon(couponId);
+        } catch (error) {
+          // Display a message for invalid QR code format
+          document.getElementById("scanMessage").innerHTML = `
+            <div style="color: red;">Invalid QR code format</div>
+          `;
+        }
+      }
+
+function onScanFailure(error) {
+  console.warn(`QR code scan error: ${error}`);
+}
+
+
+      function onScanFailure(error) {
+        // Handle scan failure if needed
+        console.warn(`QR code scan error: ${error}`);
+      }
+    </script>
+    <!-- Add HTML5 QR Scanner library -->
+    <script src="https://unpkg.com/html5-qrcode"></script>
+  </head>
+  <body>
+    <h1 id="formTitle">Create a Coupon</h1>
+    
+    <div class="tab-container">
+      <button id="createTab" class="tab-button active" onclick="showCreateForm()">Create Coupon</button>
+      <button id="redeemTab" class="tab-button" onclick="showRedeemForm()">Redeem Coupon</button>
+    </div>
+
+    <!-- Existing create form - add id="createForm" -->
+    <form id="createForm" onsubmit="event.preventDefault(); submitCoupon();">
+      <label for="Expiration_Date">Expiration Date:</label>
+      <input type="date" id="Expiration_Date" required />
+
+      <label for="Service_Type">Service Type:</label>
+      <select id="Service_Type" required>
+        <option value="">Select a service type</option>
+        <option value="Restaurants">Food & Beverage</option>
+        <option value="CampusBookstore">Retail</option>
+        <option value="GymMemberships">Wellness</option>
+        <option value="StudentTransport">Travel & Transportation</option>
+        <option value="MovieTickets">Entertainment</option>
+        <option value="OnlineCourses">Educational Services</option>
+        <option value="SoftwareDiscounts">Technology</option>
+        <option value="DiningPlans">University-Specific Services</option>
+
+      </select>
+
+      <label for="Discount">Discount (%):</label>
+      <input type="number" id="Discount" placeholder="Enter discount (0-100)" required />
+
+      <label for="Uses_Allowed">Uses Allowed:</label>
+      <select id="Uses_Allowed" required></select>
+
+       <label for="Reciepient_Name">Recipient Name:</label>
+      <input type="text" id="Reciepient_Name" placeholder="Enter recipient name" required />
+
+      <label for="Recipient_Email">Recipient Email:</label>
+      <input type="email" id="Recipient_Email" placeholder="Enter email (must end with @nyu.edu)" required />
+      
+      <label for="Phone_Number">Phone Number:</label>
+      <input type="tel" id="Phone_Number" placeholder="Enter phone number (e.g., 1234567890)" required />
+
+      <button type="submit">Generate Coupon</button>
+    </form>
+
+    <!-- New redeem form -->
+    <div id="redeemForm" style="display: none;">
+      <div class="scanner-container">
+        <label for="Admin_Password">Admin Password:</label>
+        <input type="password" id="Admin_Password" placeholder="Enter admin password" required />
+        <button id="validatePasswordButton" onclick="validateAdminPassword()" class="button">
+          Validate Password
+        </button>
+        <p id="passwordMessage" class="scan-message"></p>
+        
+        <!-- Scanner UI -->
+        <div id="scannerUI" style="display: none;">
+          <p class="scan-message">Scan the QR code from Apple Wallet to redeem your coupon</p>
+          <button id="startScanButton" onclick="startScanner()" class="button">
+            Start Scanner
+          </button>
+          <div id="reader"></div>
+          <button id="stopScanButton" onclick="stopScanner()" class="button">
+            Stop Scanner
+          </button>
+          <div id="scanMessage" class="scan-message"></div>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="qr-code-container" id="qrCodeContainer">
+      <p id="resultMessage"></p>
+      <div id="passKitInfo"></div>
+    </div>
+  </body>
+</html>
