@@ -37,6 +37,7 @@ A lightweight web app built and deployed using **Google Apps Script** that enabl
 
 2. **Add to Wallet**
    - Click the pass link or scan the QR code to add it to Apple Wallet
+   - <img src="https://raw.githubusercontent.com/aru456/coupon-manager/main/IMG_7543.jpg" height="500"/>
 
 3. **Redeem Coupon**
    - Go to Redeem tab
@@ -95,6 +96,8 @@ Used to generate digital passes dynamically.
 - Data stored and updated in **Google Sheets**
 
 ---
+
+
 
 ## Contact
 
